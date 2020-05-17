@@ -20,8 +20,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class LoginActivity extends AppCompatActivity {
-    public EditText email;
-    public EditText password;
+    public EditText login_email;
+    public EditText login_password;
     public Button btnLogin;
     public TextView btnRegister;
 
@@ -29,16 +29,16 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login_activity);
-        email = (EditText) findViewById(R.id.email);
-        password = (EditText) findViewById(R.id.password);
-        btnLogin = (Button) findViewById(R.id.login);
-        btnRegister = (TextView) findViewById(R.id.register);
+        login_email = (EditText) findViewById(R.id.login_email);
+        login_password = (EditText) findViewById(R.id.login_password);
+        btnLogin = (Button) findViewById(R.id.login_button);
+        btnRegister = (TextView) findViewById(R.id.login_register_button);
 
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String emailListen = email.getText().toString();
-                String passwordListen = password.getText().toString();
+                String loginEmailListen = login_email.getText().toString();
+                String loginPasswordListen = login_password.getText().toString();
                 Response.Listener<String> responseListener = new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
@@ -50,7 +50,7 @@ public class LoginActivity extends AppCompatActivity {
                                 intent.putExtra("currentUserName", jsonObject.getString("name"));
                                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                                 startActivity(intent);
-                                finish();
+                                //finish();
                         } catch (JSONException e) {
                             //throw new RuntimeException(e);
                             Toast.makeText(LoginActivity.this, "Login Failed", Toast.LENGTH_LONG).show();
@@ -63,7 +63,7 @@ public class LoginActivity extends AppCompatActivity {
                         Log.d("Error", "Error occurred", error);
                     }
                 };
-                LoginRequest loginRequest = new LoginRequest(emailListen, passwordListen, responseListener, errorListener);
+                LoginRequest loginRequest = new LoginRequest(loginEmailListen, loginPasswordListen, responseListener, errorListener);
                 RequestQueue queue = Volley.newRequestQueue(LoginActivity.this);
                 queue.add(loginRequest);
             }

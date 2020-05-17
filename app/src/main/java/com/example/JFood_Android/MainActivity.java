@@ -5,12 +5,17 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.ExpandableListAdapter;
 import android.widget.ExpandableListView;
 import android.widget.Toast;
 
+import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.JsonRequest;
 import com.android.volley.toolbox.Volley;
 
 import org.json.JSONArray;
@@ -25,10 +30,13 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<Food> foodIdList = new ArrayList<>();
     private HashMap<Seller, ArrayList<Food>> childMapping = new HashMap<>();
 
+    private static int currentUserId;
+    private static String currentUserName;
+
     ArrayList<String> listDataHeader= new ArrayList<>();
     HashMap<String, ArrayList<String>> listDataChild = new HashMap<>();
     ExpandableListView expListView;
-
+    MainListAdapter mainListAdapter;
 
 
     @Override
@@ -36,20 +44,14 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity);
 
-        expListView = findViewById(R.id.lvExp);
+        Bundle extras = getIntent().getExtras();
+        if(extras!=null){
+            currentUserId = extras.getInt("currentUserId");
+            currentUserName = extras.getString("currentUserName");
+        }
 
+        expListView = (ExpandableListView) findViewById(R.id.lvExp);
         refreshList();
-
-        expListView.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
-            @Override
-            public boolean onGroupClick(ExpandableListView parent, View v,
-                                        int groupPosition, long id) {
-                Toast.makeText(getApplicationContext(),
-                "Group Clicked " + listDataHeader.get(groupPosition),
-                Toast.LENGTH_SHORT).show();
-                return false;
-            }
-        });
 
         // Listview Group expanded listener
         expListView.setOnGroupExpandListener(new ExpandableListView.OnGroupExpandListener() {
@@ -73,17 +75,33 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+
+        expListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
+
+            @Override
+            public boolean onChildClick(ExpandableListView parent, View v,
+                                        int groupPosition, int childPosition, long id) {
+                Toast.makeText(
+                        getApplicationContext(),
+                        listDataHeader.get(groupPosition)
+                                + " : "
+                                + listDataChild.get(
+                                listDataHeader.get(groupPosition)).get(
+                                childPosition), Toast.LENGTH_SHORT)
+                        .show();
+                return false;
+            }
+        });
+
     }
 
     protected void refreshList() {
-        Response.Listener<String> responseListener = new Response.Listener<String>() {
+        Response.Listener<JSONArray> responseListener = new Response.Listener<JSONArray>() {
             @Override
-            public void onResponse(String response) {
+            public void onResponse(JSONArray response) {
                 try {
-                    JSONArray jsonResponse = new JSONArray(response);
-
-                    for (int i = 0; i < jsonResponse.length(); i++) {
-                        JSONObject food = jsonResponse.getJSONObject(i);
+                    for (int i = 0; i < response.length(); i++) {
+                        JSONObject food = response.getJSONObject(i);
                         JSONObject seller = food.getJSONObject("seller");
                         JSONObject location = seller.getJSONObject("location");
 
@@ -100,8 +118,9 @@ public class MainActivity extends AppCompatActivity {
                         if(listSeller.size()>0){
                             boolean success = true;
                             for (Seller object : listSeller){
-                                if((object.getId()==(seller1.getId()))){
+                                if ((object.getId() == (seller1.getId()))) {
                                     success = false;
+                                    break;
                                 }
                             }
                             if(success){
@@ -112,16 +131,17 @@ public class MainActivity extends AppCompatActivity {
                             listSeller.add(seller1);
                         }
 
-                        int foodId = seller.getInt("id");
-                        String foodName = seller.getString("name");
-                        int foodPrice = seller.getInt("price");
-                        String foodCategory = seller.getString("category");
+                        int foodId = food.getInt("id");
+                        String foodName = food.getString("name");
+                        int foodPrice = food.getInt("price");
+                        String foodCategory = food.getString("category");
                         Food food1 = new Food(foodId, foodName, foodPrice, foodCategory, seller1);
                         if(foodIdList.size()>0){
                             boolean success = true;
                             for (Food object : foodIdList){
-                                if((object.getId()==(food1.getId()))){
+                                if ((object.getId() == (food1.getId()))) {
                                     success = false;
+                                    break;
                                 }
                             }
                             if(success){
@@ -146,8 +166,6 @@ public class MainActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
 
-
-
                 for(Seller s : listSeller){
                     listDataHeader.add(s.getName());
                     Log.d("foods", String.valueOf(s.getName()));
@@ -164,22 +182,23 @@ public class MainActivity extends AppCompatActivity {
                 }
                 Log.d("sellertest", "onResponse: "+listDataHeader);
                 Log.d("sellertest", "onResponse: "+listDataChild);
-                MainListAdapter mainListAdapter = new MainListAdapter(MainActivity.this,listDataHeader,listDataChild);
+                mainListAdapter = new MainListAdapter(MainActivity.this,listDataHeader,listDataChild);
                 expListView.setAdapter(mainListAdapter);
             }
         };
+
         Response.ErrorListener errorListener = new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
                 Log.d("Error", "Error occurred", error);
             }
         };
+
         MenuRequest menuRequest = new MenuRequest(responseListener, errorListener);
         RequestQueue queue = Volley.newRequestQueue(MainActivity.this);
         queue.add(menuRequest);
+
     }
-
-
 
 
 }

@@ -1,5 +1,7 @@
 package com.example.JFood_Android;
 
+import com.example.JFood_Android.R;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -89,7 +91,7 @@ public class MainListAdapter extends BaseExpandableListAdapter {
         }
 
         TextView lblListHeader = (TextView) convertView
-                .findViewById(R.id.lblListSeller);
+                .findViewById(R.id.lblListHeader);
         lblListHeader.setTypeface(null, Typeface.BOLD);
         lblListHeader.setText(headerTitle);
 

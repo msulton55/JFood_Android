@@ -1,6 +1,5 @@
 package com.example.JFood_Android;
 
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
@@ -20,9 +19,9 @@ import org.json.JSONObject;
 
 public class RegisterActivity extends AppCompatActivity {
 
-    public EditText nameInput;
-    public EditText emailInput;
-    public EditText passwordInput;
+    public EditText register_name;
+    public EditText register_email;
+    public EditText register_password;
     public Button btnRegisterSubmit;
 
     @Override
@@ -30,29 +29,28 @@ public class RegisterActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.register_activity);
 
-        nameInput = (EditText) findViewById(R.id.name);
-        emailInput = (EditText) findViewById(R.id.email);
-        passwordInput = (EditText) findViewById(R.id.password);
-        btnRegisterSubmit = (Button) findViewById(R.id.registerSubmit);
+        register_name = (EditText) findViewById(R.id.register_name);
+        register_email = (EditText) findViewById(R.id.register_email);
+        register_password = (EditText) findViewById(R.id.register_password);
+        btnRegisterSubmit = (Button) findViewById(R.id.register_submit_button);
 
         btnRegisterSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String name = nameInput.getText().toString();
-                String email = emailInput.getText().toString();
-                String password = passwordInput.getText().toString();
-
+                final String registerName = register_name.getText().toString();
+                final String registerEmail = register_email.getText().toString();
+                final String registerPassword = register_password.getText().toString();
                 Response.Listener<String> responseListener = new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
                         try {
                             JSONObject jsonObject = new JSONObject(response);
                             if (jsonObject != null)
-                                Toast.makeText(RegisterActivity.this, "Register Successful",
-                                       Toast.LENGTH_LONG).show();
+                                Toast.makeText(RegisterActivity.this, "Register Success!", Toast.LENGTH_LONG).show();
+
                         } catch (JSONException e) {
                             //throw new RuntimeException(e);
-                            Toast.makeText(RegisterActivity.this, "Register Failed", Toast.LENGTH_LONG).show();
+                            Toast.makeText(RegisterActivity.this, "Register Failed!", Toast.LENGTH_LONG).show();
                         }
                     }
                 };
@@ -62,7 +60,7 @@ public class RegisterActivity extends AppCompatActivity {
                         Log.d("Error", "Error occurred", error);
                     }
                 };
-                RegisterRequest registerRequest = new RegisterRequest(name, email, password, responseListener, errorListener);
+                RegisterRequest registerRequest = new RegisterRequest(registerName, registerEmail, registerPassword, responseListener, errorListener);
                 RequestQueue queue = Volley.newRequestQueue(RegisterActivity.this);
                 queue.add(registerRequest);
             }
