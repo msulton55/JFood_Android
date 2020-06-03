@@ -50,7 +50,7 @@ public class LoginActivity extends AppCompatActivity {
                                 intent.putExtra("currentUserName", jsonObject.getString("name"));
                                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                                 startActivity(intent);
-                                //finish();
+                                finish();
                         } catch (JSONException e) {
                             //throw new RuntimeException(e);
                             Toast.makeText(LoginActivity.this, "Login Failed", Toast.LENGTH_LONG).show();

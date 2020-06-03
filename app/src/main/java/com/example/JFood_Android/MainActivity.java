@@ -2,9 +2,11 @@ package com.example.JFood_Android;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ExpandableListAdapter;
 import android.widget.ExpandableListView;
 import android.widget.Toast;
@@ -36,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
     ArrayList<String> listDataHeader= new ArrayList<>();
     HashMap<String, ArrayList<String>> listDataChild = new HashMap<>();
     ExpandableListView expListView;
+    Button pesananButton;
     MainListAdapter mainListAdapter;
 
 
@@ -50,8 +53,24 @@ public class MainActivity extends AppCompatActivity {
             currentUserName = extras.getString("currentUserName");
         }
 
+        Log.d("Name", currentUserName);
+        Log.d("ID", String.valueOf(currentUserId));
+
         expListView = (ExpandableListView) findViewById(R.id.lvExp);
+        pesananButton = (Button) findViewById(R.id.pesananButton);
+
         refreshList();
+
+        pesananButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, SelesaiPesananActivity.class);
+                intent.putExtra("currentUserName", currentUserName);
+                intent.putExtra("currentUserId", currentUserId);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
+            }
+        });
 
         // Listview Group expanded listener
         expListView.setOnGroupExpandListener(new ExpandableListView.OnGroupExpandListener() {
@@ -81,15 +100,24 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public boolean onChildClick(ExpandableListView parent, View v,
                                         int groupPosition, int childPosition, long id) {
-                Toast.makeText(
-                        getApplicationContext(),
-                        listDataHeader.get(groupPosition)
-                                + " : "
-                                + listDataChild.get(
-                                listDataHeader.get(groupPosition)).get(
-                                childPosition), Toast.LENGTH_SHORT)
-                        .show();
-                return false;
+                Intent intent = new Intent(MainActivity.this, BuatPesananActivity.class);
+
+                int food_id = childMapping.get(listSeller.get(groupPosition)).get(childPosition).getId();
+                String food_name = childMapping.get(listSeller.get(groupPosition)).get(childPosition).getName();
+                String food_category = childMapping.get(listSeller.get(groupPosition)).get(childPosition).getCategory();
+                int food_price = childMapping.get(listSeller.get(groupPosition)).get(childPosition).getPrice();
+
+                intent.putExtra("currentUserId", currentUserId);
+                intent.putExtra("currentUserName", currentUserName);
+
+                intent.putExtra("food_id", food_id);
+                intent.putExtra("food_name", food_name);
+                intent.putExtra("food_category", food_category);
+                intent.putExtra("food_price", food_price);
+
+                startActivity(intent);
+                return true;
+
             }
         });
 
