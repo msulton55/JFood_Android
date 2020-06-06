@@ -7,7 +7,7 @@ import com.android.volley.toolbox.StringRequest;
 import org.json.JSONObject;
 
 public class CheckPromoRequest extends JsonObjectRequest {
-    private static final String PROMO_URL = "http://10.0.2.2:8080/promo/";
+    private static final String PROMO_URL = "http://10.0.2.2:8080/promo/code/";
 
     public CheckPromoRequest(String promoCode, Response.Listener<JSONObject> listener,
                              Response.ErrorListener errorListener)

@@ -169,8 +169,7 @@ public class SelesaiPesananActivity extends AppCompatActivity {
                     public void onResponse(String response) {
                         Intent intent = new Intent(SelesaiPesananActivity.this, MainActivity.class);
                         if (response.equals("true")) {
-                            if (button_cancel.isActivated())
-                                Toast.makeText(SelesaiPesananActivity.this, "Pesanan Selesai!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(SelesaiPesananActivity.this, "Pesanan Selesai!", Toast.LENGTH_SHORT).show();
                         } else {
                             Toast.makeText(SelesaiPesananActivity.this, "Permintaan gagal!", Toast.LENGTH_SHORT).show();
                         }

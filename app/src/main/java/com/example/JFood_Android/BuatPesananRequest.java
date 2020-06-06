@@ -44,7 +44,6 @@ public class BuatPesananRequest extends StringRequest {
         params.put("foodIdList", foodIdList);
     }
 
-
     @Override
     protected Map<String, String> getParams() throws AuthFailureError {
         Map<String, String> newParams = new HashMap<>();
@@ -52,12 +51,14 @@ public class BuatPesananRequest extends StringRequest {
             if (entry.getValue() instanceof String)
                 newParams.put(entry.getKey(), (String) entry.getValue());
             else if (entry.getValue() instanceof ArrayList)
-                for (int i = 0; i < ((ArrayList) entry.getValue()).size(); i ++)
-                    newParams.put(entry.getKey(), ((ArrayList) entry.getValue()).get(i).toString());
+                for (int i = 0; i < ((ArrayList) entry.getValue()).size(); i++)
+                newParams.put(entry.getKey(), ((ArrayList) entry.getValue()).get(i).toString());
             else
                 newParams.put(entry.getKey(), String.valueOf(entry.getValue()));
         }
         return newParams;
     }
+
+
 
 }

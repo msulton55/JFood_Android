@@ -33,7 +33,16 @@ public class BuatPesananActivity extends AppCompatActivity {
     private String promoCode;
     private String selectedPayment;
     private Promo promo;
-    private int prevFoodId = 0;
+    private boolean pesananActive;
+    private TextView food_name;
+    private TextView food_category ;
+    private TextView food_price ;
+    private TextView total_price ;
+    private TextView promo_code ;
+    private EditText promo_code_field ;
+    private RadioGroup radioGroup ;
+    private Button hitung ;
+    private Button pesan ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,15 +59,15 @@ public class BuatPesananActivity extends AppCompatActivity {
             foodPrice = extras.getInt("food_price");
         }
 
-        TextView food_name = (TextView) findViewById(R.id.foodTextview);
-        TextView food_category = (TextView) findViewById(R.id.categoryTextview);
-        final TextView food_price = (TextView) findViewById(R.id.priceTextview);
-        final TextView total_price = (TextView) findViewById(R.id.total_price);
-        final TextView promo_code = (TextView) findViewById(R.id.promo_code);
-        final EditText promo_code_field = (EditText) findViewById(R.id.promo_code_field);
-        final RadioGroup radioGroup = (RadioGroup) findViewById(R.id.radioGroup);
-        Button hitung = (Button) findViewById(R.id.hitung);
-        final Button pesan = (Button) findViewById(R.id.pesan);
+        food_name = (TextView) findViewById(R.id.foodTextview);
+        food_category = (TextView) findViewById(R.id.categoryTextview);
+        food_price = (TextView) findViewById(R.id.priceTextview);
+        total_price = (TextView) findViewById(R.id.total_price);
+        promo_code = (TextView) findViewById(R.id.promo_code);
+        promo_code_field = (EditText) findViewById(R.id.promo_code_field);
+        radioGroup = (RadioGroup) findViewById(R.id.radioGroup);
+        hitung = (Button) findViewById(R.id.hitung);
+        pesan = (Button) findViewById(R.id.pesan);
 
         promo_code.setEnabled(false);
         promo_code_field.setEnabled(false);
@@ -159,38 +168,45 @@ public class BuatPesananActivity extends AppCompatActivity {
                 RadioButton selectedRadio = findViewById(selectedRadioId);
                 selectedPayment = selectedRadio.getText().toString().trim();
 
-                cekPesanan(currentUserId);
+                Log.d("food_price", food_price.getText().toString().trim().substring(3));
                 buatPesanan();
 
-                Log.d("Name", currentUserName);
-                Log.d("ID", String.valueOf(currentUserId));
+                /*
+                boolean result = cekPesanan(currentUserId);
+                if (!result)
+                else
+                    Toast.makeText(BuatPesananActivity.this, "Pesanan Gagal! Sedang ada pesanan aktif!", Toast.LENGTH_SHORT).show();
+                 */
 
             }
         });
 
     }
 
-    private void cekPesanan(int customerId) {
+    private boolean cekPesanan(int customerId) {
+        pesananActive = false;
         Response.Listener<JSONArray> cekPesananListener = new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {
                 if (response.length() == 0)
                     return;
                 else {
+                    pesananActive = true;
+                    /*
                     for (int i = 0; i < response.length(); i++) {
                         try {
                             JSONObject invoiceObject = response.getJSONObject(i);
                             JSONArray foodsArray = invoiceObject.getJSONArray("foods");
-                            for (int j = 0; j < foodsArray.length(); i++) {
+                            for (int j = 0; j < foodsArray.length(); j++) {
                                 JSONObject foodObject = foodsArray.getJSONObject(j);
-                                int id = foodObject.getInt("id");
-                                prevFoodId = id;
+                                prevFoodId = foodObject.getInt("id");
                             }
 
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
                     }
+                     */
                 }
             }
         };
@@ -203,6 +219,7 @@ public class BuatPesananActivity extends AppCompatActivity {
         LiatPesananRequest liatPesananRequest = new LiatPesananRequest(customerId, cekPesananListener, errorListener);
         RequestQueue queue = Volley.newRequestQueue(BuatPesananActivity.this);
         queue.add(liatPesananRequest);
+        return pesananActive;
     }
 
     private void buatPesanan() {
@@ -215,7 +232,7 @@ public class BuatPesananActivity extends AppCompatActivity {
                     if (jsonObject != null)
                         Toast.makeText(BuatPesananActivity.this, "Pesanan Berhasil !", Toast.LENGTH_SHORT).show();
                 } catch (JSONException e) {
-                    Toast.makeText(BuatPesananActivity.this, "Pesanan Gagal !", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(BuatPesananActivity.this, "Pesanan Gagal! Sedang ada pesanan aktif!", Toast.LENGTH_SHORT).show();
                 }
 
             }
@@ -227,6 +244,7 @@ public class BuatPesananActivity extends AppCompatActivity {
             }
         };
 
+        /*
         if (prevFoodId == 0) {
             if (selectedPayment.equals("CASH"))
                 buatPesananRequest = new BuatPesananRequest(15000, id_food, currentUserId, buatPesananListener, errorListener);
@@ -239,9 +257,23 @@ public class BuatPesananActivity extends AppCompatActivity {
                 Toast.makeText(BuatPesananActivity.this, "Pesanan ini sedang dalam proses!", Toast.LENGTH_SHORT).show();
             }
         }
+         */
+
+        if (selectedPayment.equals("CASH"))
+            buatPesananRequest = new BuatPesananRequest(15000, currentUserId, id_food, buatPesananListener, errorListener);
+        else
+            if (promoCode.isEmpty()) {
+                Toast.makeText(BuatPesananActivity.this, "Code promo tidak boleh kosong!", Toast.LENGTH_SHORT).show();
+                return;
+            } else if (Integer.parseInt(food_price.getText().toString().trim().substring(4)) < promo.getMinPrice()) {
+                Toast.makeText(BuatPesananActivity.this, "Harga makanan tidak mencapai minimum harga promo!", Toast.LENGTH_SHORT).show();
+                return;
+            } else
+                buatPesananRequest = new BuatPesananRequest(promoCode, currentUserId, id_food, buatPesananListener, errorListener);
 
         RequestQueue queue = Volley.newRequestQueue(BuatPesananActivity.this);
         queue.add(buatPesananRequest);
+        finish();
 
     }
 
