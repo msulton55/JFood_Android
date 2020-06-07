@@ -1,4 +1,4 @@
-package com.example.JFood_Android;
+package com.example.JFood_Android.Activity;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -15,15 +15,25 @@ import android.widget.Toast;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.example.JFood_Android.Model.Promo;
+import com.example.JFood_Android.R;
+import com.example.JFood_Android.Request.BuatPesananRequest;
+import com.example.JFood_Android.Request.CheckPromoRequest;
+import com.example.JFood_Android.Request.LiatPesananRequest;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
+/**
+ * This class will provide order food functionality to the user.
+ * @author Muhammad Sulton Tauhid
+ * @version June 7th, 2020
+ */
 public class BuatPesananActivity extends AppCompatActivity {
+
+    // Instances variables
     private int currentUserId;
     private String currentUserName;
     private int id_food;
@@ -49,6 +59,7 @@ public class BuatPesananActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.buat_pesanan_activity);
 
+        // Passing data information from MainActivity
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             currentUserId = extras.getInt("currentUserId");
@@ -58,6 +69,8 @@ public class BuatPesananActivity extends AppCompatActivity {
             foodCategory = extras.getString("food_category");
             foodPrice = extras.getInt("food_price");
         }
+
+        // Initiate all components to the activity
 
         food_name = (TextView) findViewById(R.id.foodTextview);
         food_category = (TextView) findViewById(R.id.categoryTextview);
@@ -78,8 +91,6 @@ public class BuatPesananActivity extends AppCompatActivity {
         food_price.setText("Rp. " + String.valueOf(foodPrice));
         total_price.setText("Rp. 0");
 
-        Log.d("Customer name: ", currentUserName);
-
         radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
@@ -96,6 +107,9 @@ public class BuatPesananActivity extends AppCompatActivity {
             }
         });
 
+        // End of components initiation
+
+        // Count button function
         hitung.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -106,17 +120,14 @@ public class BuatPesananActivity extends AppCompatActivity {
                 promoCode = promo_code_field.getText().toString();
                 selectedPayment = selectedRadio.getText().toString().trim();
 
-                if (selectedPayment.equals("CASH")) {
+                if (selectedPayment.equals("CASH"))
                     total_price.setText("Rp. " + String.valueOf(foodPrice));
-                }
 
                 else if (selectedPayment.equals("CASHLESS") && !promoCode.isEmpty()) {
-
                     Response.Listener<JSONObject> listener = new Response.Listener<JSONObject>() {
                         @Override
                         public void onResponse(JSONObject response) {
                             try {
-
                                 int id = response.getInt("id");
                                 String code = response.getString("code");
                                 int discount = response.getInt("discount");
@@ -129,7 +140,6 @@ public class BuatPesananActivity extends AppCompatActivity {
                                     total_price.setText("Rp: " + String.valueOf(foodPrice));
                                 } else
                                     total_price.setText("Rp: " + String.valueOf(foodPrice));
-
 
                             } catch (JSONException e) {
                                 e.printStackTrace();
@@ -148,18 +158,15 @@ public class BuatPesananActivity extends AppCompatActivity {
                     queue.add(checkPromoRequest);
 
 
-                }
-
-                else
+                } else
                     total_price.setText("Rp. " + String.valueOf(foodPrice));
 
                 pesan.setEnabled(true);
 
-
             }
         });
 
-
+        // Order button function
         pesan.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -169,20 +176,20 @@ public class BuatPesananActivity extends AppCompatActivity {
                 selectedPayment = selectedRadio.getText().toString().trim();
 
                 Log.d("food_price", food_price.getText().toString().trim().substring(3));
+
                 buatPesanan();
-
-                /*
-                boolean result = cekPesanan(currentUserId);
-                if (!result)
-                else
-                    Toast.makeText(BuatPesananActivity.this, "Pesanan Gagal! Sedang ada pesanan aktif!", Toast.LENGTH_SHORT).show();
-                 */
-
             }
         });
 
     }
 
+    /**
+     * This function to check whether there is active order in the background.
+     * This function isn't ready to use yet.
+     *
+     * @param customerId customer's id of the invoice
+     * @return boolean. true means there is active invoice, false means no active invoice.
+     */
     private boolean cekPesanan(int customerId) {
         pesananActive = false;
         Response.Listener<JSONArray> cekPesananListener = new Response.Listener<JSONArray>() {
@@ -192,21 +199,6 @@ public class BuatPesananActivity extends AppCompatActivity {
                     return;
                 else {
                     pesananActive = true;
-                    /*
-                    for (int i = 0; i < response.length(); i++) {
-                        try {
-                            JSONObject invoiceObject = response.getJSONObject(i);
-                            JSONArray foodsArray = invoiceObject.getJSONArray("foods");
-                            for (int j = 0; j < foodsArray.length(); j++) {
-                                JSONObject foodObject = foodsArray.getJSONObject(j);
-                                prevFoodId = foodObject.getInt("id");
-                            }
-
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                     */
                 }
             }
         };
@@ -222,6 +214,9 @@ public class BuatPesananActivity extends AppCompatActivity {
         return pesananActive;
     }
 
+    /**
+     * This function explicitly create order request to the server.
+     */
     private void buatPesanan() {
         BuatPesananRequest buatPesananRequest = null;
         Response.Listener<String> buatPesananListener = new Response.Listener<String>() {
@@ -244,21 +239,6 @@ public class BuatPesananActivity extends AppCompatActivity {
             }
         };
 
-        /*
-        if (prevFoodId == 0) {
-            if (selectedPayment.equals("CASH"))
-                buatPesananRequest = new BuatPesananRequest(15000, id_food, currentUserId, buatPesananListener, errorListener);
-            else
-                buatPesananRequest = new BuatPesananRequest(promoCode, id_food, currentUserId, buatPesananListener, errorListener);
-        } else {
-            if (prevFoodId != id_food) {
-                buatPesananRequest = new BuatPesananRequest(id_food, currentUserId, buatPesananListener, errorListener);
-            } else {
-                Toast.makeText(BuatPesananActivity.this, "Pesanan ini sedang dalam proses!", Toast.LENGTH_SHORT).show();
-            }
-        }
-         */
-
         if (selectedPayment.equals("CASH"))
             buatPesananRequest = new BuatPesananRequest(15000, currentUserId, id_food, buatPesananListener, errorListener);
         else
@@ -274,7 +254,6 @@ public class BuatPesananActivity extends AppCompatActivity {
         RequestQueue queue = Volley.newRequestQueue(BuatPesananActivity.this);
         queue.add(buatPesananRequest);
         finish();
-
     }
 
 }

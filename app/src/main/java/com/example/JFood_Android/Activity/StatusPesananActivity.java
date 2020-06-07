@@ -1,4 +1,4 @@
-package com.example.JFood_Android;
+package com.example.JFood_Android.Activity;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -14,46 +14,56 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.Volley;
+import com.example.JFood_Android.R;
+import com.example.JFood_Android.Request.BatalPesananRequest;
+import com.example.JFood_Android.Request.LiatPesananRequest;
+import com.example.JFood_Android.Request.SelesaiPesananRequest;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class SelesaiPesananActivity extends AppCompatActivity {
+/**
+ * This class is to check the status of the order.
+ *
+ * @author Muhammad Sulton Tauhid
+ * @version June 7th, 2020
+ */
+public class StatusPesananActivity extends AppCompatActivity {
 
-    private static int currentUserId;
-    private static String currentUserName;
+    private int currentUserId;
+    private String currentUserName;
 
-    TextView static_invoice_customer_id;
-    TextView selesai_invoice_customer_id;
-    TextView static_invoice_customer_name;
-    TextView selesai_invoice_customer_name;
-    TextView static_invoice_id;
-    TextView selesai_invoice_id;
-    TextView static_invoice_date;
-    TextView selesai_invoice_date;
-    TextView static_invoice_payment;
-    TextView selesai_invoice_payment;
-    TextView static_invoice_status;
-    TextView selesai_invoice_status;
-    TextView static_invoice_food_name;
-    TextView selesai_invoice_food_name;
-    TextView static_invoice_food_category;
-    TextView selesai_invoice_food_category;
-    TextView static_invoice_food_price;
-    TextView selesai_invoice_food_price;
-    TextView static_invoice_identifier;
-    TextView selesai_invoice_identifier ;
-    TextView static_invoice_identifier_opt1;
-    TextView selesai_invoice_identifier_opt1;
-    TextView static_invoice_identifier_opt2;
-    TextView selesai_invoice_identifier_opt2;
-    TextView static_invoice_identifier_opt3 ;
-    TextView selesai_invoice_identifier_opt3;
-    TextView static_invoice_identifier_opt4;
-    TextView selesai_invoice_identifier_opt4;
-    Button button_cancel;
-    Button button_finish;
+    private TextView static_invoice_customer_id;
+    private TextView selesai_invoice_customer_id;
+    private TextView static_invoice_customer_name;
+    private TextView selesai_invoice_customer_name;
+    private TextView static_invoice_id;
+    private TextView selesai_invoice_id;
+    private TextView static_invoice_date;
+    private TextView selesai_invoice_date;
+    private TextView static_invoice_payment;
+    private TextView selesai_invoice_payment;
+    private TextView static_invoice_status;
+    private TextView selesai_invoice_status;
+    private TextView static_invoice_food_name;
+    private TextView selesai_invoice_food_name;
+    private TextView static_invoice_food_category;
+    private TextView selesai_invoice_food_category;
+    private TextView static_invoice_food_price;
+    private TextView selesai_invoice_food_price;
+    private TextView static_invoice_identifier;
+    private TextView selesai_invoice_identifier ;
+    private TextView static_invoice_identifier_opt1;
+    private TextView selesai_invoice_identifier_opt1;
+    private TextView static_invoice_identifier_opt2;
+    private TextView selesai_invoice_identifier_opt2;
+    private TextView static_invoice_identifier_opt3 ;
+    private TextView selesai_invoice_identifier_opt3;
+    private TextView static_invoice_identifier_opt4;
+    private TextView selesai_invoice_identifier_opt4;
+    private Button button_cancel;
+    private Button button_finish;
 
 
 
@@ -68,6 +78,7 @@ public class SelesaiPesananActivity extends AppCompatActivity {
             currentUserName = extras.getString("currentUserName");
         }
 
+        // Instantiate all components to the activity.
         static_invoice_customer_id = findViewById(R.id.static_invoice_customer_id);
         selesai_invoice_customer_id = findViewById(R.id.selesai_invoice_customer_id);
         static_invoice_customer_name = findViewById(R.id.static_invoice_customer_name);
@@ -132,19 +143,20 @@ public class SelesaiPesananActivity extends AppCompatActivity {
 
         fetchPesanan();
 
-        final RequestQueue queue = Volley.newRequestQueue(SelesaiPesananActivity.this);
+        final RequestQueue queue = Volley.newRequestQueue(StatusPesananActivity.this);
 
+        // Cancel button function
         button_cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Response.Listener<String> buttonListener = new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        Intent intent = new Intent(SelesaiPesananActivity.this, MainActivity.class);
+                        Intent intent = new Intent(StatusPesananActivity.this, MainActivity.class);
                         if (response.equals("true")) {
-                            Toast.makeText(SelesaiPesananActivity.this, "Pesanan Berhasil dibatalkan!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(StatusPesananActivity.this, "Pesanan Berhasil dibatalkan!", Toast.LENGTH_SHORT).show();
                         } else {
-                            Toast.makeText(SelesaiPesananActivity.this, "Permintaan gagal!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(StatusPesananActivity.this, "Permintaan gagal!", Toast.LENGTH_SHORT).show();
                         }
                         startActivity(intent);
                         finish();
@@ -161,17 +173,18 @@ public class SelesaiPesananActivity extends AppCompatActivity {
             }
         });
 
+        // Finish button function
         button_finish.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Response.Listener<String> buttonListener = new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        Intent intent = new Intent(SelesaiPesananActivity.this, MainActivity.class);
+                        Intent intent = new Intent(StatusPesananActivity.this, MainActivity.class);
                         if (response.equals("true")) {
-                            Toast.makeText(SelesaiPesananActivity.this, "Pesanan Selesai!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(StatusPesananActivity.this, "Pesanan Selesai!", Toast.LENGTH_SHORT).show();
                         } else {
-                            Toast.makeText(SelesaiPesananActivity.this, "Permintaan gagal!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(StatusPesananActivity.this, "Permintaan gagal!", Toast.LENGTH_SHORT).show();
                         }
                         startActivity(intent);
                         finish();
@@ -188,7 +201,6 @@ public class SelesaiPesananActivity extends AppCompatActivity {
             }
         });
 
-
     }
 
     private void fetchPesanan() {
@@ -196,8 +208,8 @@ public class SelesaiPesananActivity extends AppCompatActivity {
             @Override
             public void onResponse(JSONArray response) {
                 if (response.length() == 0) {
-                    Toast.makeText(SelesaiPesananActivity.this, "Tidak ada pesanan aktif!", Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(SelesaiPesananActivity.this, MainActivity.class);
+                    Toast.makeText(StatusPesananActivity.this, "Tidak ada pesanan aktif!", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(StatusPesananActivity.this, MainActivity.class);
                     startActivity(intent);
                     finish();
                 } else {
@@ -285,14 +297,16 @@ public class SelesaiPesananActivity extends AppCompatActivity {
 
             }
         };
+
         Response.ErrorListener errorListener = new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
                 Log.d("Error", "Error occurred", error);
             }
         };
+
         LiatPesananRequest request = new LiatPesananRequest(currentUserId, listener, errorListener);
-        RequestQueue queue = Volley.newRequestQueue(SelesaiPesananActivity.this);
+        RequestQueue queue = Volley.newRequestQueue(StatusPesananActivity.this);
         queue.add(request);
     }
 }

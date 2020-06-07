@@ -1,4 +1,4 @@
-package com.example.JFood_Android;
+package com.example.JFood_Android.Request;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Response;
